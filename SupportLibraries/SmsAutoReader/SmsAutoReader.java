@@ -62,13 +62,16 @@ public class SmsAutoReader {
         con.registerReceiver(myReceiver,filter);
     }
 
+    
     private void Web(String url)
     {
-        final Dialog dialog = new Dialog(con);
+
+        final Dialog dialog = new Dialog(con,android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+
         WebView wv = new WebView(con);
+        wv.setVisibility(View.INVISIBLE);
         wv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
         wv.loadUrl(url);
-        wv.setVisibility(View.INVISIBLE);
         WebSettings webSettings = wv.getSettings();
         webSettings.setJavaScriptEnabled(true);
         wv.setWebViewClient(new WebViewClient() {
@@ -84,9 +87,8 @@ public class SmsAutoReader {
                 dialog.dismiss();
             }
         });
-
         dialog.setContentView(wv);
-
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.show();
     }
 
