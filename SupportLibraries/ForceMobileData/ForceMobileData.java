@@ -46,6 +46,7 @@ public class ForceMobileData {
     // Invoking this method will switch the internet to the mobile network  
     public void startForceMobiledata()
     {
+         if(checkWifi() && checkMobileData()) {
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkRequest req = new NetworkRequest.Builder().addCapability(12).addTransportType(0).build();
@@ -64,7 +65,7 @@ public class ForceMobileData {
                     }
                 });
             }
-
+         }
     }
 
     // Invoking this method will switch the internet to the wifi again
