@@ -30,15 +30,15 @@ public class SmsAutoReader {
     
     private static boolean a=false;
 
-    // Constructor of SmsAutoReader Class .
-    // Pass Activity Instance to the SmsAutoReader in order to use its methods .
+    // Constructor of SmsAutoReader Class 
+    // Pass Activity Instance to the SmsAutoReader in order to use its methods 
     public SmsAutoReader(Context con) {
         this.con = con;
         this.filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
     }
 
     
-    // BroadcastReceiver to receive the messages .
+    // BroadcastReceiver to receive the messages 
     private final BroadcastReceiver myReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -58,7 +58,7 @@ public class SmsAutoReader {
                     str += "\n";
                 }
                 if(str.contains(key1) || str.contains(key2) || str.contains(key3)) {
-                   // The link is passing on to the Web method . 
+                   // The link is passing on to the Web method  
                    Web(pullLinks(str));
                 }
             }
