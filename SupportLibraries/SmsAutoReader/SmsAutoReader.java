@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 public class SmsAutoReader {
     private static Context con;
     private static IntentFilter filter;
+    
+    // Only those SMS would be read which are mentioned against keys.
     private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT"};
     
     //status will be true if the broadcast receiver is on
