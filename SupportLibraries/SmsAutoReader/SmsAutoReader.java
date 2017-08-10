@@ -7,6 +7,7 @@ import android.telephony.SmsMessage;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -19,10 +20,8 @@ import java.util.regex.Pattern;
 public class SmsAutoReader {
     private static Context con;
     private static IntentFilter filter;
-    
-    // Only those SMS would be read which are mentioned against keys.
     private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT"};
-    
+
     //status will be true if the broadcast receiver is on
     //status will be false if the broadcast receiver is off
     private static boolean status=false;
@@ -66,14 +65,21 @@ public class SmsAutoReader {
 
     // After receiving the code invoke this method to stop the BroadcastReceiver
     // Do'nt try to invoke this method dynamically that means by the action of any button
-    
+
 
     public void StopSmsAutoReader()
     {
-        if(status){
-            con.unregisterReceiver(myReceiver);
-            status=false;
-        }
+        try {
+            if(status){
+                con.unregisterReceiver(myReceiver);
+                status=false;
+            }
+        }catch (IllegalArgumentException e){
+            Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
+        catch (Exception e){
+            Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
+
+
 
     }
     // Invoke this method in order to start the SmsAutoReader
@@ -103,7 +109,7 @@ public class SmsAutoReader {
 
 
     //  This method is used to pull link from Sms String
-    
+
     private String pullLinks(String text) {
         String link = "";
 
