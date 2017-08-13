@@ -8,6 +8,9 @@ import android.widget.Toast;
 
 import java.lang.reflect.Method;
 
+/**
+*The function of this class is to forcefully use mobile data when mobile data and wifi both are available
+*/
 public class ForceMobileData {
 
     private static Context context;
@@ -43,7 +46,7 @@ public class ForceMobileData {
     }
 
 
-    // Invoking this method will switch the internet to the mobile network  
+    // Invoking this method will switch the internet to the mobile data when both mobile data and wifi are available  
     public void startForceMobiledata()
     {
          if(checkWifi() && checkMobileData()) {
