@@ -3,6 +3,15 @@ import android.os.Build;
 import android.telephony.SubscriptionManager;
 import android.widget.Toast;
 
+/**
+* This class has 2 methods
+* Invoke  isOperatorEligible() method for single sim android device or for 1st sim of dual sim android device
+* It will toast mcc , mnc and operator name if sim operator is eligible for mobile connect
+* It will toast false if sim operator is not eligible for mobile connect
+* isOperatorEligible(int SimSlot) method is same as above but you have to mention the sim slot number
+* It will toast false if wrong sim slot number is passed
+*/
+
 public class Mcc_Mnc_Discovery {
 
  private static Context context;
