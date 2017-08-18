@@ -2,8 +2,6 @@ package com.example.chinmay.msisdnshare;
 
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
@@ -34,34 +32,32 @@ import java.util.Map;
 
 public class MobileConnectShareScope {
     private static Context con;
-    private static final int TimeOut = 10000;
+
     private static final String Discovery_key = "0758d7f6-5cb3-47a6-8aa7-b393ace51d96";
     private static final String Discovery_Secret = "0d42d633-d665-4f68-8c0c-b1d70938fe29";
     private static final String Token_key = "x-0758d7f6-5cb3-47a6-8aa7-b393ace51d96";
     private static final String Token_Secret = "x-0d42d633-d665-4f68-8c0c-b1d70938fe29";
     private static final String Redirect_url = "https://e-complaintmanager.000webhostapp.com/";
     private static final String Discovery_url = "https://india.discover.mobileconnect.io/gsma/v2/discovery";
-    private ProgressDialog loading;
+    private TextView textDiscover,textAuth,textToken,textUserInfo;
     private static String href_auth , href_token,href_user;
     private LinearLayout DialogLayout;
-    private Dialog dialog;
+    private AlertDialog dialog;
+    private  long starttime;
 
     public MobileConnectShareScope(Context context, Activity activity) {
         con = context;
-        dialog = new Dialog(context,android.R.style.Theme_Light_NoTitleBar_Fullscreen);
+        AlertDialog.Builder builder = new AlertDialog.Builder(con);
         DialogLayout = ((LinearLayout)activity.getLayoutInflater().inflate(R.layout.dialog_layout, null));
-        dialog.setContentView(DialogLayout);
+        builder.setView(DialogLayout);
+        dialog = builder.create();
     }
 
 
 
-    private  void  addTextView(final String paramString)
+    private  void  addTextView(final TextView textView)
     {
-        TextView localTextView = new TextView(con);
-        localTextView.setText(paramString);
-        DialogLayout.addView(localTextView);
-
-
+        DialogLayout.addView(textView);
     }
 
     private void showAlertMessage(String paramString1 , String paramString2)
@@ -89,6 +85,7 @@ public class MobileConnectShareScope {
 
     private void mConnectShareScopeDiscovery()
     {
+        starttime=System.currentTimeMillis();
         //loading = ProgressDialog.show(this.con,"Please wait...","Discovery...",false,false);
         final Handler mHandler = new Handler();
         new Thread(new Runnable() {
@@ -103,8 +100,9 @@ public class MobileConnectShareScope {
             }
         }).start();
 
-
-        addTextView("Discovering...");
+         textDiscover = new TextView(con);
+         textDiscover.setText("Discovering...");
+        addTextView(textDiscover);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,Discovery_url,
                 new Response.Listener<String>() {
                     @Override
@@ -130,9 +128,8 @@ public class MobileConnectShareScope {
                             href_auth = jsonArray.getJSONObject(0).getString("href")+"?client_id="+Token_key+"&response_type=code&scope=openid+mc_attr_vm_share&redirect_uri="+Redirect_url+"&acr_values=2&state=123456&nonce=1234567";
                             href_token = jsonArray.getJSONObject(1).getString("href");
                             href_user = jsonArray.getJSONObject(2).getString("href");
-                            addTextView("Discovered");
-
-                            mConnectShareScopeAuthentication();
+                            textDiscover.setText("Discovered  "+String.valueOf(System.currentTimeMillis()-starttime)+" ms");
+                                                  mConnectShareScopeAuthentication();
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();
@@ -184,8 +181,13 @@ public class MobileConnectShareScope {
 
     private void mConnectShareScopeAuthentication()
     {
+        starttime=System.currentTimeMillis();
         //loading = ProgressDialog.show(this.con,"Please wait...","Authentication...",false,false);
-        addTextView("Authenticating...");
+
+        textAuth = new TextView(con);
+        textAuth.setText("Authenticating...");
+        addTextView(textAuth);
+
         WebView wv = new WebView(con);
         WebSettings webSettings = wv.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -196,7 +198,10 @@ public class MobileConnectShareScope {
                 view.loadUrl(url);
 
                 if(url.contains("code=")){
-                    addTextView("Authenticated");
+                    textAuth.setText("Authenticated  "+String.valueOf(System.currentTimeMillis()-starttime)+" ms");
+
+
+
                     //loading.dismiss();
                     mConnectShareScopeToken(url.substring(url.indexOf("code=")+5,url.length()));
                 }
@@ -213,7 +218,11 @@ public class MobileConnectShareScope {
 
     private void mConnectShareScopeToken(final String code)
     {
-        addTextView("Fetching  Token...");
+        starttime=System.currentTimeMillis();
+        textToken = new TextView(con);
+        textToken.setText("Fetching  Token...");
+        addTextView(textToken);
+
         //loading = ProgressDialog.show(this.con,"Please wait...","Fetching...  Token",false,false);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,href_token,
                 new Response.Listener<String>() {
@@ -223,17 +232,10 @@ public class MobileConnectShareScope {
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            addTextView("access token : "+jsonObject.getString("access_token"));
                             mConnectShareScopeUserInfo(jsonObject.getString("access_token"));
+                            textToken.setText("Token Fetched  "+String.valueOf(System.currentTimeMillis()-starttime)+" ms");
 
-                            final Handler handler = new Handler();
-                            final Runnable r = new Runnable() {
-                                public void run() {
-                                    dialog.dismiss();
-                                    handler.postDelayed(this, 3000);
-                                }
-                            };
-                            handler.postDelayed(r, 3000);
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -286,8 +288,12 @@ public class MobileConnectShareScope {
     private  void mConnectShareScopeUserInfo(final String code)
     {
 
+        starttime=System.currentTimeMillis();
         //loading = ProgressDialog.show(con,"Please wait..","Fetching... Number",false,false);
-        addTextView("Fetching Number ...");
+        textUserInfo = new TextView(con);
+        textUserInfo.setText("Fetching Number ...");
+        addTextView(textUserInfo);
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, href_user,
                 new Response.Listener<String>() {
                     @Override
@@ -295,7 +301,17 @@ public class MobileConnectShareScope {
                         //loading.dismiss();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            addTextView("Number : "+jsonObject.getString("device_msisdn"));
+                            textUserInfo.setText("Number : "+jsonObject.getString("device_msisdn")+"   "+String.valueOf(System.currentTimeMillis()-starttime)+" ms");
+
+                            final Handler handler = new Handler();
+                            final Runnable r = new Runnable() {
+                                public void run() {
+                                    dialog.dismiss();
+                                    handler.postDelayed(this, 10000);
+                                }
+                            };
+                            handler.postDelayed(r, 10000);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(con, e.toString(), Toast.LENGTH_SHORT).show();
