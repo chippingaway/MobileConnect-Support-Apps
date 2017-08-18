@@ -29,22 +29,34 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+* This class is used to call all 4 MobileConnect APIs
+* Invoking mConnectShareScope() method will start the process to call all 4 MobileConnect APIs
+*/
 public class MobileConnectShareScope {
+    // Context of the MobileConnectShareScope class
     private static Context con;
 
+    // These are the credentials
     private static final String Discovery_key = "0758d7f6-5cb3-47a6-8aa7-b393ace51d96";
     private static final String Discovery_Secret = "0d42d633-d665-4f68-8c0c-b1d70938fe29";
     private static final String Token_key = "x-0758d7f6-5cb3-47a6-8aa7-b393ace51d96";
     private static final String Token_Secret = "x-0d42d633-d665-4f68-8c0c-b1d70938fe29";
     private static final String Redirect_url = "https://e-complaintmanager.000webhostapp.com/";
     private static final String Discovery_url = "https://india.discover.mobileconnect.io/gsma/v2/discovery";
+   
+   // These strings will contain the url of the APIs 
+   private static String href_auth , href_token,href_user;
+   
+   // These are the componants of dialog which will appear when we invoke mConnectShareScope() method
     private TextView textDiscover,textAuth,textToken,textUserInfo;
-    private static String href_auth , href_token,href_user;
     private LinearLayout DialogLayout;
     private AlertDialog dialog;
+   
+    // It will record the starting time of all the APIs
     private  long starttime;
-
+    
+    // Contructer of the MobileConnectShareScope class
     public MobileConnectShareScope(Context context, Activity activity) {
         con = context;
         AlertDialog.Builder builder = new AlertDialog.Builder(con);
@@ -54,12 +66,14 @@ public class MobileConnectShareScope {
     }
 
 
-
+    // This method is used to add textview to the dialog
     private  void  addTextView(final TextView textView)
     {
         DialogLayout.addView(textView);
     }
 
+    // This method is invoked if an error occur
+    // It shows the details of error
     private void showAlertMessage(String paramString1 , String paramString2)
     {
         AlertDialog localAlertDialog = new AlertDialog.Builder(con).create();
@@ -78,15 +92,20 @@ public class MobileConnectShareScope {
     }
 
 
+    // Invoking this method will start the process of hitting all Apis
     public void mConnectShareScope()
     {
         mConnectShareScopeDiscovery();
     }
 
+    // This method will call discovery Api
+    // The response of the discovery Api will arrive in onResponse method
+    // It will copy the url of APIs in the Strings href_auth , href_token,href_user mentioned above
+    // An alert dialog will appear if an error occur
+    // After proper response it redirects to the mConnectShareScopeAuthentication() method  
     private void mConnectShareScopeDiscovery()
     {
         starttime=System.currentTimeMillis();
-        //loading = ProgressDialog.show(this.con,"Please wait...","Discovery...",false,false);
         final Handler mHandler = new Handler();
         new Thread(new Runnable() {
             @Override
@@ -179,11 +198,14 @@ public class MobileConnectShareScope {
 
     }
 
+    // This method will call Authentication Api
+    // A code will be fetched if authentication succeed
+    // An toast will appear if an error occur 
+    // After proper response it redirects to the mConnectShareScopeToken method with code
     private void mConnectShareScopeAuthentication()
     {
         starttime=System.currentTimeMillis();
-        //loading = ProgressDialog.show(this.con,"Please wait...","Authentication...",false,false);
-
+      
         textAuth = new TextView(con);
         textAuth.setText("Authenticating...");
         addTextView(textAuth);
@@ -215,7 +237,12 @@ public class MobileConnectShareScope {
 
     }
 
-
+ 
+    // This method will call Token Api
+    // A Token will be fetched in onResponse method
+    // An Alert dialog will appear if an error occur 
+    // After proper response it redirects to the mConnectShareScopeUserInfo method with Token
+       
     private void mConnectShareScopeToken(final String code)
     {
         starttime=System.currentTimeMillis();
@@ -223,7 +250,6 @@ public class MobileConnectShareScope {
         textToken.setText("Fetching  Token...");
         addTextView(textToken);
 
-        //loading = ProgressDialog.show(this.con,"Please wait...","Fetching...  Token",false,false);
         StringRequest stringRequest = new StringRequest(Request.Method.POST,href_token,
                 new Response.Listener<String>() {
                     @Override
@@ -284,6 +310,11 @@ public class MobileConnectShareScope {
 
     }
 
+    
+    // This method will call UserInfo Api
+    // Mobile number will be fetched in onResponse method
+    // An Alert dialog will appear if an error occur 
+   
 
     private  void mConnectShareScopeUserInfo(final String code)
     {
