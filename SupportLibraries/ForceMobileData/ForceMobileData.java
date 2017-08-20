@@ -8,7 +8,7 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 
 /**
- * Created by Chinmay on 8/4/2017.
+ * This class is used to forcefully use mobile data when both wifi and mobile data are available
  */
 
 public class ForceMobileData {
@@ -21,6 +21,7 @@ public class ForceMobileData {
 
     }
 
+    // This function returns true if mobile data is enabled and viceversa
     private boolean checkMobileData()
     {
         boolean mobileDataEnabled = false;
@@ -35,15 +36,15 @@ public class ForceMobileData {
         }
         return mobileDataEnabled;
     }
-
+    // This function returns true if wifi is connected and viceversa
     private boolean checkWifi()
     {
         final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return wifi.isConnectedOrConnecting();
     }
-
-
+   // This method will start force mobile data
+   // This method will switch internet from wifi to mobile data
     public void startForceMobiledata()
     {
 
@@ -61,9 +62,9 @@ public class ForceMobileData {
                                     else {
                                         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                                         cm.setProcessDefaultNetwork(network);
-                                    }
-
-
+                                        }
+            // Here is the process that has to run on mobile data                             
+                                        
                                 } catch (IllegalStateException e) {
                                     Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
                                 }
@@ -75,6 +76,7 @@ public class ForceMobileData {
             }
     }
 
+    // This method will stop force mobile data
     public void stopForceMobiledata()
     {
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
