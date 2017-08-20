@@ -2,6 +2,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.webkit.WebSettings;
@@ -20,13 +21,10 @@ import java.util.regex.Pattern;
 public class SmsAutoReader {
     private static Context con;
     private static IntentFilter filter;
-    
+
     // Only those SMS would be read which are mentioned against keys
     private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT"};
 
-    //status will be true if the broadcast receiver is on
-    //status will be false if the broadcast receiver is off
-    private static boolean status=false;
 
     // Constructor of SmsAutoReader Class
     // Pass Activity Instance to the SmsAutoReader in order to use its methods
@@ -41,7 +39,7 @@ public class SmsAutoReader {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-
+            Toast.makeText(con,"rrrrrrr",Toast.LENGTH_SHORT).show();
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
             String str = "";
@@ -59,7 +57,8 @@ public class SmsAutoReader {
 //---display the new SMS message---
 
                 if(Arrays.asList(keys).contains(str.substring(str.indexOf("SMS from ") + 9, str.indexOf("-->")))) {
-                   Web(pullLinks(str));
+                    Web(pullLinks(str));
+                    StopSmsAutoReader();
                 }
             }
         }
@@ -72,24 +71,20 @@ public class SmsAutoReader {
     public void StopSmsAutoReader()
     {
         try {
-            if(status){
-                con.unregisterReceiver(myReceiver);
-                status=false;
-            }
+         con.unregisterReceiver(myReceiver);
         }catch (IllegalArgumentException e){
             Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
         catch (Exception e){
             Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
-
-
-
     }
+    
     // Invoke this method in order to start the SmsAutoReader
     public void StartSmsAutoReader()
     {
-        status=true;
-        con.registerReceiver(myReceiver,filter);
-    }
+        if(checkWriteExternalPermission())
+            con.registerReceiver(myReceiver,filter);
+        else
+            Toast.makeText(con,"READ_SMS permission is not permitted",Toast.LENGTH_SHORT).show();}
 
     // This method is used to load the url
 
@@ -126,6 +121,14 @@ public class SmsAutoReader {
             link = urlStr;
         }
         return link;
+    }
+
+    // This method will return true if READ_SMS permission is given or viceversa 
+    private boolean checkWriteExternalPermission()
+    {
+        String permission = "android.permission.READ_SMS";
+        int res = con.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
     }
 
 
