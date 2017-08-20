@@ -1,4 +1,3 @@
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -9,8 +8,9 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 
 /**
-*The function of this class is to forcefully use mobile data when mobile data and wifi both are available
-*/
+ * Created by Chinmay on 8/4/2017.
+ */
+
 public class ForceMobileData {
 
     private static Context context;
@@ -21,7 +21,6 @@ public class ForceMobileData {
 
     }
 
-    // Return true if mobile data is enabled 
     private boolean checkMobileData()
     {
         boolean mobileDataEnabled = false;
@@ -36,8 +35,7 @@ public class ForceMobileData {
         }
         return mobileDataEnabled;
     }
-  
-    // Return true if wifi is enabled
+
     private boolean checkWifi()
     {
         final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -46,40 +44,55 @@ public class ForceMobileData {
     }
 
 
-    // Invoking this method will switch the internet to the mobile data when both mobile data and wifi are available  
     public void startForceMobiledata()
     {
-         if(checkWifi() && checkMobileData()) {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkRequest req = new NetworkRequest.Builder().addCapability(12).addTransportType(0).build();
-                cm.requestNetwork(req, new ConnectivityManager.NetworkCallback() {
-                    @Override
-                    public void onAvailable(Network network) {
-                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            try {
-                                cm.setProcessDefaultNetwork(network);
-                              
-                              // Invoke the process here that will run on mobile data
-                              
-                            }catch (IllegalStateException e){Toast.makeText(context,e.toString(),Toast.LENGTH_SHORT).show();} 
 
+            if(checkWifi() && checkMobileData()) {
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkRequest req = new NetworkRequest.Builder().addCapability(12).addTransportType(0).build();
+                    cm.requestNetwork(req, new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(Network network) {
+                            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                try {
+                                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        cm.bindProcessToNetwork(network);
+                                    else {
+                                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                        cm.setProcessDefaultNetwork(network);
+                                    }
+
+
+                                } catch (IllegalStateException e) {
+                                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
-         }
     }
 
-    // Invoking this method will switch the internet to the wifi again
     public void stopForceMobiledata()
     {
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {try {
-            cm.setProcessDefaultNetwork(null);
-        }catch (IllegalStateException e){Toast.makeText(context,e.toString(),Toast.LENGTH_SHORT).show();}}
+        {
+            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {cm.bindProcessToNetwork(null);
+
+            }
+            else{
+
+                try {
+                    if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    cm.setProcessDefaultNetwork(null);
+                }catch (IllegalStateException e){Toast.makeText(context,e.toString(),Toast.LENGTH_SHORT).show();}
+            }
+
+        }
     }
 
 
 }
-
