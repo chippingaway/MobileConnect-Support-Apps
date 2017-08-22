@@ -5,10 +5,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -69,23 +72,27 @@ public class SmsAutoReader {
     public void StopSmsAutoReader()
     {
         try {
-         con.unregisterReceiver(myReceiver);
+            con.unregisterReceiver(myReceiver);
         }catch (IllegalArgumentException e){
-            }
+        }
         catch (Exception e){
-            Log.e("error",e.toString())}
+            Log.e("error",e.toString());}
     }
-    
+
     // Invoke this method in order to start the SmsAutoReader
-    public String StartSmsAutoReader()
-    {
+    public String StartSmsAutoReader() throws JSONException {
         if(checkWriteExternalPermission()){
             con.registerReceiver(myReceiver,filter);
-             return null;
+            return null;
         }
-        else
-            return "{"error":"READ_SMS error","error_description":"READ_SMS permission  not permitted"}";
-            Toast.makeText(con,"READ_SMS permission is not permitted",Toast.LENGTH_SHORT).show();}
+        else{
+            JSONObject object = new JSONObject();
+            object.put("error","READ_SMS error");
+            object.put("error_description","READ_SMS permission not permitted");
+            return object.toString();
+        }
+
+        }
 
     // This method is used to load the url
 
@@ -124,7 +131,7 @@ public class SmsAutoReader {
         return link;
     }
 
-    // This method will return true if READ_SMS permission is given or viceversa 
+    // This method will return true if READ_SMS permission is given or viceversa
     private boolean checkWriteExternalPermission()
     {
         String permission = "android.permission.READ_SMS";
