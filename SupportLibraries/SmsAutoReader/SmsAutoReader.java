@@ -38,8 +38,6 @@ public class SmsAutoReader {
     private final BroadcastReceiver myReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            Toast.makeText(con,"rrrrrrr",Toast.LENGTH_SHORT).show();
             Bundle bundle = intent.getExtras();
             SmsMessage[] msgs = null;
             String str = "";
@@ -73,17 +71,20 @@ public class SmsAutoReader {
         try {
          con.unregisterReceiver(myReceiver);
         }catch (IllegalArgumentException e){
-            Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
+            }
         catch (Exception e){
-            Toast.makeText(con,e.toString(),Toast.LENGTH_SHORT).show();}
+            Log.e("error",e.toString())}
     }
     
     // Invoke this method in order to start the SmsAutoReader
-    public void StartSmsAutoReader()
+    public String StartSmsAutoReader()
     {
-        if(checkWriteExternalPermission())
+        if(checkWriteExternalPermission()){
             con.registerReceiver(myReceiver,filter);
+             return null;
+        }
         else
+            return "{"error":"READ_SMS error","error_description":"READ_SMS permission  not permitted"}";
             Toast.makeText(con,"READ_SMS permission is not permitted",Toast.LENGTH_SHORT).show();}
 
     // This method is used to load the url
