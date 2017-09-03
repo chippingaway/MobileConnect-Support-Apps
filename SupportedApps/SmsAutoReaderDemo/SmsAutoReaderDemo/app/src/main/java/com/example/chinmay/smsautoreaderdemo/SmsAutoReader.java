@@ -31,7 +31,7 @@ public class SmsAutoReader {
     private static IntentFilter filter;
 
     // Only those SMS would be read which are mentioned against keys
-    private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT","MConnect","AD-MCONNT"};
+    private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT","MConnect","AD-MCONNT","TA-Mcnect"};
 
 
     // Constructor of SmsAutoReader Class
