@@ -46,6 +46,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class is used to to autherize via "Mobile Data" even when mobile is connected to Wifi
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String Discovery_key = "88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
