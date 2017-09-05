@@ -6,9 +6,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,7 +29,7 @@ public class SmsAutoReader {
     private static IntentFilter filter;
 
     // Only those SMS would be read which are mentioned against keys
-    private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT"};
+    private static final String[] keys ={"2291","AH-MCONNT","ADMCONNT","MConnect","AD-MCONNT","TA-Mcnect","DD-Aircel"};
 
 
     // Constructor of SmsAutoReader Class
@@ -55,12 +58,15 @@ public class SmsAutoReader {
                     str += msgs[i].getMessageBody().toString();
                     str += "\n";
                 }
-//---display the new SMS message---
 
                 if(Arrays.asList(keys).contains(str.substring(str.indexOf("SMS from ") + 9, str.indexOf("-->")))) {
+                 // Load the url that is retrieved from sms
                     Web(pullLinks(str));
                     StopSmsAutoReader();
                 }
+
+
+
             }
         }
     };
@@ -81,7 +87,7 @@ public class SmsAutoReader {
 
     // Invoke this method in order to start the SmsAutoReader
     public String StartSmsAutoReader() throws JSONException {
-        if(checkWriteExternalPermission()){
+        if(checkSmsPermission()){
             con.registerReceiver(myReceiver,filter);
             return null;
         }
@@ -92,24 +98,27 @@ public class SmsAutoReader {
             return object.toString();
         }
 
-        }
+    }
 
     // This method is used to load the url
 
     private void Web(String url)
     {
-        WebView wv = new WebView(con);
-        wv.loadUrl(url);
-        WebSettings webSettings = wv.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        wv.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
 
-                return false;
+        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
             }
         });
+        RequestQueue requestQueue = Volley.newRequestQueue(con);
+        requestQueue.add(stringRequest);
+
     }
 
 
@@ -132,7 +141,7 @@ public class SmsAutoReader {
     }
 
     // This method will return true if READ_SMS permission is given or viceversa
-    private boolean checkWriteExternalPermission()
+    private boolean checkSmsPermission()
     {
         String permission = "android.permission.READ_SMS";
         int res = con.checkCallingOrSelfPermission(permission);
@@ -141,3 +150,4 @@ public class SmsAutoReader {
 
 
 }
+
