@@ -52,11 +52,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String Discovery_key = "88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
-    private static final String Discovery_Secret = "5d6c7979-7851-4b45-a81a-1acb12ba334d";
-    private static final String Redirect_url = "http://localhost:8080/MCIndiaDummy/callback";
-    private static final String Discovery_url = "https://india.discover.mobileconnect.io/gsma/v2/discovery";
-    private static final String Token_key = "x-88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
     private static String href_auth ,number;
     private ProgressDialog loading;
     Button force,normal;
@@ -66,6 +61,14 @@ public class MainActivity extends AppCompatActivity {
     NetworkRequest networkRequestM;
     private static volatile Network cellularNetwork;
 
+    // These are the credentials
+    
+    private static final String Discovery_key = "88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
+    private static final String Discovery_Secret = "5d6c7979-7851-4b45-a81a-1acb12ba334d";
+    private static final String Redirect_url = "http://localhost:8080/MCIndiaDummy/callback";
+    private static final String Discovery_url = "https://india.discover.mobileconnect.io/gsma/v2/discovery";
+    private static final String Token_key = "x-88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         cellularNetwork = null;
 
-
+        // Initialize network request
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             network_call = new Network_Call();
             networkRequestM = new NetworkRequest.Builder()
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
          }else
             Toast.makeText(this,"Required android version is android 5 or above",Toast.LENGTH_SHORT).show();
 
+        // Request network of transport type cellular
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             connectivityManager.requestNetwork(networkRequestM,network_call);
         }
@@ -91,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         text = (EditText)findViewById(R.id.editText);
         normal = (Button)findViewById(R.id.normal_button);
         force = (Button)findViewById(R.id.force_button);
+        
+        // A normal flow of autherization will began after pressing normal button
+        
         normal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // A force flow of autherization will began after pressing normal button
+        
         force.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+// Discovering operator
 
     public void startDiscovery(final int type)
     {
@@ -152,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
                                 startAuth(type);
                             else{
 
-
+                                // If cellularNetwork object is not null then it will start force flow    
+                                
                                 if(cellularNetwork!=null)
                                 {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -162,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
                                         Toast.makeText(getApplicationContext(),"Android version must be 5 or above",Toast.LENGTH_SHORT).show();
                                 }
                                 else {
+                                    
+                                    // If cellularNetwork object is  null then it will start normal flow
+                                    
                                     Toast.makeText(getApplicationContext(),"Force Condition not found",Toast.LENGTH_SHORT).show();
                                     startAuth(1);
                                 }
@@ -236,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
         mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 
+    // webview to load url for normal flow
 
     void startAuth(final int type)
     {
@@ -301,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+// Network_Call class is used to detect cellular network
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -332,6 +348,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+   // startAuthMobileData method is used for force autherization
+   // Network.openConnection  method is used to load the url with mobile data
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private  void  startAuthMobileData()
     {
@@ -350,8 +368,10 @@ public class MainActivity extends AppCompatActivity {
                     conn.setRequestProperty("Accept-Encoding", "identity");
                     conn.setReadTimeout(5000);
                     conn.connect();
-
+                   
                     int status = conn.getResponseCode();
+                   
+                    // If the response code is 301 or 302 or 303 then function will continue
                     if (status != HttpURLConnection.HTTP_OK) {
                         if (status == HttpURLConnection.HTTP_MOVED_TEMP
                                 || status == HttpURLConnection.HTTP_MOVED_PERM
@@ -369,6 +389,8 @@ public class MainActivity extends AppCompatActivity {
                          else
                              newUrl = conn.getHeaderField("Location");
 
+                        
+                        // If the redirect url has code within it
                         if (newUrl.contains("code="))
                         {
                             loading.dismiss();
@@ -377,6 +399,9 @@ public class MainActivity extends AppCompatActivity {
                             break;
 
                         }
+                        
+                        // If the redirect url contains the value of msisdn_header
+                        // That means cellular data object we recieved if different from the object we mentioned for the autherization 
                          if((newUrl.charAt(newUrl.indexOf("msisdn_header")+14))=='&'){
                             conn.disconnect();
                             hit[0] =1;
