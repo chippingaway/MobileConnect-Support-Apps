@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private static  EditText mobile_number;
     private static String number,href_auth,nonce;
     private ProgressDialog loading;
+    
+    // These are the credentials
+    
     private static final String Discovery_key = "88ae3b5d-18f1-4fc5-a97e-a6c5eae9cd5a";
     private static final String Discovery_Secret = "5d6c7979-7851-4b45-a81a-1acb12ba334d";
     private static final String Redirect_url = "http://localhost:8080/MCIndiaDummy/callback";
@@ -50,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // Check sms permission 
+        // Grant if not given
+        
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(!checkSmsPermission())
                 ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS},123);
@@ -75,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Method to check sms permission
+    
     private boolean checkSmsPermission()
     {
         String permission = "android.permission.READ_SMS";
@@ -99,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Discovering the operator
+    
     private void startDiscovery()
     {
 
@@ -123,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
                             Random random = new Random();
                             nonce = String.valueOf(random.nextInt(100000)+9999);
                             href_auth = jsonArray.getJSONObject(0).getString("href")+"?client_id="+Token_key+"&response_type=code&scope=openid+mc_india_tc&redirect_uri="+Redirect_url+"&acr_values=2&state="+nonce+"123456&nonce="+nonce+"&login_hint=MSISDN:91"+number;
+                            
+                            // Start webview activity and pass autherize url along with it
+                            
                             Intent i = new Intent(MainActivity.this,Webview.class);
                             Bundle bundle = new Bundle();
                             bundle.putString("url",href_auth);
