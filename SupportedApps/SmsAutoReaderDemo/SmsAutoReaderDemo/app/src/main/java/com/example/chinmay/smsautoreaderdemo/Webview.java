@@ -26,6 +26,7 @@ public class Webview extends Activity {
         final ProgressBar bar = (ProgressBar)findViewById(R.id.pro);
         Bundle bundle = getIntent().getExtras();
         String url = bundle.getString("url");
+        // Initialize SmsAutoReader  class
         SmsAutoReader reader = new SmsAutoReader(Webview.this);
         try {
             reader.StartSmsAutoReader();
@@ -53,6 +54,9 @@ public class Webview extends Activity {
 
                 view.loadUrl(url);
                 Log.e("a",url);
+                
+                // Finish webview activity on receiving sms code or error in final url
+                
                 if(url.contains("code=")){
                     Toast.makeText(getApplicationContext(),"Success : "+url.substring(url.indexOf("code=")+5,url.length()),Toast.LENGTH_SHORT).show();
                     finish();
